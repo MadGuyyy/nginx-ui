@@ -1,9 +1,19 @@
 from flask import Flask
 from config import config
 from flask_moment import Moment
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 moment = Moment()
+auth = HTTPBasicAuth()
+users = {"admin": generate_password_hash(config["default"].AUTH_PASSWORD)}
+
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and check_password_hash(users.get(username), password):
+        return username
 
 
 def create_app(config_name):

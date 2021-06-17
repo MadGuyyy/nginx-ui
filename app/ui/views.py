@@ -1,9 +1,11 @@
 from app.ui import ui
 import flask
 import os
+from app import auth
 
 
 @ui.route('/',  methods=['GET'])
+@auth.login_required
 def index():
     """
     Delivers the home page of Nginx UI.

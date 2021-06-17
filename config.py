@@ -3,7 +3,7 @@ import os
 
 class Config(object):
     SECRET_KEY = os.urandom(64).hex()
-
+    AUTH_PASSWORD = "supersecret"
     NGINX_PATH = "/etc/nginx"
     SITES_AVAILABLE_PATH = os.path.join(NGINX_PATH, "sites-available")
     SITES_ENABLED_PATH = os.path.join(NGINX_PATH, "sites-enabled")
