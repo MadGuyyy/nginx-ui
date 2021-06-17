@@ -1,5 +1,4 @@
 import datetime
-import io
 import os
 
 import flask
@@ -22,10 +21,10 @@ def get_config(name: str):
     """
     nginx_path = flask.current_app.config["NGINX_PATH"]
 
-    with io.open(os.path.join(nginx_path, name), "r") as f:
-        _file = f.read()
+    with open(os.path.join(nginx_path, name), "r") as f:
+        file = f.read()
 
-    return flask.render_template("config.html", name=name, file=_file), 200
+    return flask.render_template("config.html", name=name, file=file), 200
 
 
 @api.route("/config/<name>", methods=["POST"])
@@ -43,8 +42,8 @@ def post_config(name: str):
     content = flask.request.get_json()
     nginx_path = flask.current_app.config["NGINX_PATH"]
 
-    with io.open(os.path.join(nginx_path, name), "w") as f:
-        f.write(content["file"])
+    with open(os.path.join(nginx_path, name), "w") as file:
+        file.write(content["file"])
 
     return flask.make_response({"success": True}), 200
 
@@ -77,7 +76,7 @@ def get_domains():
                 sites_enabled.append(name)
 
     # sort sites by name
-    sites_available = sorted(sites_available, key=lambda _: _["name"])
+    sites_available = sorted(sites_available, key=lambda _site: _site["name"])
     return flask.render_template("domains.html", sites_available=sites_available, sites_enabled=sites_enabled), 200
 
 
@@ -109,7 +108,7 @@ def get_domain(name: str):
             if os.path.exists(enabled_site):
                 enabled = True
 
-            with io.open(available_site, "r") as file_content:
+            with open(available_site, "r") as file_content:
                 file_data = file_content.read()
 
             break
@@ -135,11 +134,11 @@ def post_domain(name: str):
     name = name.replace(".", "_") + ".conf"
 
     try:
-        with io.open(os.path.join(available_path, name), "w") as file:
+        with open(os.path.join(available_path, name), "w") as file:
             file.write(new_domain)
 
         response = flask.jsonify({"success": True}), 201
-    except Exception as ex:
+    except OSError as ex:
         response = flask.jsonify({"success": False, "error_msg": ex}), 500
 
     return response
@@ -197,7 +196,7 @@ def put_domain(name: str):
     for site in os.listdir(available_path):
         available_site = os.path.join(available_path, site)
         if os.path.isfile(available_site) and site.startswith(name):
-            with io.open(available_site, "w") as file:
+            with open(available_site, "w") as file:
                 file.write(content["file"])
 
     return flask.make_response({"success": True}), 200
