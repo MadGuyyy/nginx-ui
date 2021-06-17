@@ -4,8 +4,9 @@ import os
 class Config(object):
     SECRET_KEY = os.urandom(64).hex()
 
-    NGINX_PATH = '/etc/nginx'
-    CONFIG_PATH = os.path.join(NGINX_PATH, 'conf.d')
+    NGINX_PATH = "/etc/nginx"
+    SITES_AVAILABLE_PATH = os.path.join(NGINX_PATH, "sites-available")
+    SITES_ENABLED_PATH = os.path.join(NGINX_PATH, "sites-enabled")
 
     @staticmethod
     def init_app(app):

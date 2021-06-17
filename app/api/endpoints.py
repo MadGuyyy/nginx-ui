@@ -1,12 +1,13 @@
 import datetime
 import io
 import os
+
 import flask
 
 from app.api import api
 
 
-@api.route('/config/<name>',  methods=['GET'])
+@api.route("/config/<name>", methods=["GET"])
 def get_config(name: str):
     """
     Reads the file with the corresponding name that was passed.
@@ -17,15 +18,15 @@ def get_config(name: str):
     :return: Rendered HTML document with content of the configuration file.
     :rtype: str
     """
-    nginx_path = flask.current_app.config['NGINX_PATH']
+    nginx_path = flask.current_app.config["NGINX_PATH"]
 
-    with io.open(os.path.join(nginx_path, name), 'r') as f:
+    with io.open(os.path.join(nginx_path, name), "r") as f:
         _file = f.read()
 
-    return flask.render_template('config.html', name=name, file=_file), 200
+    return flask.render_template("config.html", name=name, file=_file), 200
 
 
-@api.route('/config/<name>', methods=['POST'])
+@api.route("/config/<name>", methods=["POST"])
 def post_config(name: str):
     """
     Accepts the customized configuration and saves it in the configuration file with the supplied name.
@@ -37,15 +38,15 @@ def post_config(name: str):
     :rtype: werkzeug.wrappers.Response
     """
     content = flask.request.get_json()
-    nginx_path = flask.current_app.config['NGINX_PATH']
+    nginx_path = flask.current_app.config["NGINX_PATH"]
 
-    with io.open(os.path.join(nginx_path, name), 'w') as f:
-        f.write(content['file'])
+    with io.open(os.path.join(nginx_path, name), "w") as f:
+        f.write(content["file"])
 
-    return flask.make_response({'success': True}), 200
+    return flask.make_response({"success": True}), 200
 
 
-@api.route('/domains', methods=['GET'])
+@api.route("/domains", methods=["GET"])
 def get_domains():
     """
     Reads all files from the configuration file directory and checks the state of the site configuration.
@@ -53,37 +54,30 @@ def get_domains():
     :return: Rendered HTML document with the domains
     :rtype: str
     """
-    config_path = flask.current_app.config['CONFIG_PATH']
+    available_path = flask.current_app.config["SITES_AVAILABLE_PATH"]
+    enabled_path = flask.current_app.config["SITES_ENABLED_PATH"]
     sites_available = []
     sites_enabled = []
 
-    for _ in os.listdir(config_path):
-
-        if os.path.isfile(os.path.join(config_path, _)):
-            domain, state = _.rsplit('.', 1)
-
-            if state == 'conf':
-                time = datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(config_path, _)))
-
-                sites_available.append({
-                    'name': domain,
-                    'time': time
-                })
-                sites_enabled.append(domain)
-            elif state == 'disabled':
-                time = datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(config_path, _)))
-
-                sites_available.append({
-                    'name': domain.rsplit('.', 1)[0],
-                    'time': time
-                })
+    for site in os.listdir(available_path):
+        available_site = os.path.join(available_path, site)
+        enabled_site = os.path.join(enabled_path, site)
+        if os.path.isfile(available_site):
+            name = site.split(".")[0].replace("_", ".")
+            time = datetime.datetime.fromtimestamp(os.path.getmtime(available_site))
+            sites_available.append({
+                "name": name,
+                "time": time
+            })
+            if os.path.exists(enabled_site):
+                sites_enabled.append(name)
 
     # sort sites by name
-    sites_available = sorted(sites_available, key=lambda _: _['name'])
-    return flask.render_template('domains.html', sites_available=sites_available, sites_enabled=sites_enabled), 200
+    sites_available = sorted(sites_available, key=lambda _: _["name"])
+    return flask.render_template("domains.html", sites_available=sites_available, sites_enabled=sites_enabled), 200
 
 
-@api.route('/domain/<name>', methods=['GET'])
+@api.route("/domain/<name>", methods=["GET"])
 def get_domain(name: str):
     """
     Takes the name of the domain configuration file and
@@ -95,28 +89,30 @@ def get_domain(name: str):
     :return: Rendered HTML document with the domain
     :rtype: str
     """
-    config_path = flask.current_app.config['CONFIG_PATH']
-    _file = ''
-    enabled = True
+    name = name.replace(".", "_")
+    available_path = flask.current_app.config["SITES_AVAILABLE_PATH"]
+    enabled_path = flask.current_app.config["SITES_ENABLED_PATH"]
+    file_data = ""
+    enabled = False
 
-    for _ in os.listdir(config_path):
+    for site in os.listdir(available_path):
+        available_site = os.path.join(available_path, site)
+        enabled_site = os.path.join(enabled_path, site)
+        if os.path.isfile(available_site) and site.startswith(name):
+            name = site.split(".")[0].replace("_", ".")
 
-        if os.path.isfile(os.path.join(config_path, _)):
-            if _.startswith(name):
-                domain, state = _.rsplit('.', 1)
+            if os.path.exists(enabled_site):
+                enabled = True
 
-                if state == 'disabled':
-                    enabled = False
+            with io.open(available_site, "r") as file_content:
+                file_data = file_content.read()
 
-                with io.open(os.path.join(config_path, _), 'r') as f:
-                    _file = f.read()
+            break
 
-                break
-
-    return flask.render_template('domain.html', name=name, file=_file, enabled=enabled), 200
+    return flask.render_template("domain.html", name=name, file=file_data, enabled=enabled), 200
 
 
-@api.route('/domain/<name>', methods=['POST'])
+@api.route("/domain/<name>", methods=["POST"])
 def post_domain(name: str):
     """
     Creates the configuration file of the domain.
@@ -126,22 +122,24 @@ def post_domain(name: str):
 
     :return: Returns a status about the success or failure of the action.
     """
-    config_path = flask.current_app.config['CONFIG_PATH']
-    new_domain = flask.render_template('new_domain.j2', name=name)
-    name = name + '.conf.disabled'
+
+    available_path = flask.current_app.config["SITES_AVAILABLE_PATH"]
+    new_domain = flask.render_template("new_domain.j2", name=name)
+
+    name = name.replace(".", "_") + ".conf"
 
     try:
-        with io.open(os.path.join(config_path, name), 'w') as f:
-            f.write(new_domain)
+        with io.open(os.path.join(available_path, name), "w") as file:
+            file.write(new_domain)
 
-        response = flask.jsonify({'success': True}), 201
+        response = flask.jsonify({"success": True}), 201
     except Exception as ex:
-        response = flask.jsonify({'success': False, 'error_msg': ex}), 500
+        response = flask.jsonify({"success": False, "error_msg": ex}), 500
 
     return response
 
 
-@api.route('/domain/<name>', methods=['DELETE'])
+@api.route("/domain/<name>", methods=["DELETE"])
 def delete_domain(name: str):
     """
     Deletes the configuration file of the corresponding domain.
@@ -151,24 +149,30 @@ def delete_domain(name: str):
 
     :return: Returns a status about the success or failure of the action.
     """
-    config_path = flask.current_app.config['CONFIG_PATH']
+    name = name.replace(".", "_")
+    available_path = flask.current_app.config["SITES_AVAILABLE_PATH"]
+    enabled_path = flask.current_app.config["SITES_ENABLED_PATH"]
     removed = False
 
-    for _ in os.listdir(config_path):
+    for site in os.listdir(available_path):
+        available_site = os.path.join(available_path, site)
+        enabled_site = os.path.join(enabled_path, site)
+        if os.path.isfile(available_site) and site.startswith(name):
+            if os.path.exists(enabled_site):
+                os.remove(enabled_site)
 
-        if os.path.isfile(os.path.join(config_path, _)):
-            if _.startswith(name):
-                os.remove(os.path.join(config_path, _))
-                removed = not os.path.exists(os.path.join(config_path, _))
-                break
+            os.remove(available_site)
+
+            removed = not os.path.exists(available_site) and not os.path.exists(enabled_site)
+            break
 
     if removed:
-        return flask.jsonify({'success': True}), 200
+        return flask.jsonify({"success": True}), 200
     else:
-        return flask.jsonify({'success': False}), 400
+        return flask.jsonify({"success": False}), 400
 
 
-@api.route('/domain/<name>', methods=['PUT'])
+@api.route("/domain/<name>", methods=["PUT"])
 def put_domain(name: str):
     """
     Updates the configuration file with the corresponding domain name.
@@ -178,20 +182,20 @@ def put_domain(name: str):
 
     :return: Returns a status about the success or failure of the action.
     """
+    name = name.replace(".", "_")
     content = flask.request.get_json()
-    config_path = flask.current_app.config['CONFIG_PATH']
+    available_path = flask.current_app.config["SITES_AVAILABLE_PATH"]
 
-    for _ in os.listdir(config_path):
+    for site in os.listdir(available_path):
+        available_site = os.path.join(available_path, site)
+        if os.path.isfile(available_site) and site.startswith(name):
+            with io.open(available_site, "w") as file:
+                file.write(content["file"])
 
-        if os.path.isfile(os.path.join(config_path, _)):
-            if _.startswith(name):
-                with io.open(os.path.join(config_path, _), 'w') as f:
-                    f.write(content['file'])
-
-    return flask.make_response({'success': True}), 200
+    return flask.make_response({"success": True}), 200
 
 
-@api.route('/domain/<name>/enable', methods=['POST'])
+@api.route("/domain/<name>/enable", methods=["POST"])
 def enable_domain(name: str):
     """
     Activates the domain in Nginx so that the configuration is applied.
@@ -201,17 +205,22 @@ def enable_domain(name: str):
 
     :return: Returns a status about the success or failure of the action.
     """
+    name = name.replace(".", "_")
     content = flask.request.get_json()
-    config_path = flask.current_app.config['CONFIG_PATH']
+    available_path = flask.current_app.config["SITES_AVAILABLE_PATH"]
+    enabled_path = flask.current_app.config["SITES_ENABLED_PATH"]
 
-    for _ in os.listdir(config_path):
+    for site in os.listdir(available_path):
+        available_site = os.path.join(available_path, site)
+        enabled_site = os.path.join(enabled_path, site)
+        if os.path.isfile(available_site) and site.startswith(name):
+            if content["enable"]:
+                if os.path.exists(enabled_site):
+                    break
 
-        if os.path.isfile(os.path.join(config_path, _)):
-            if _.startswith(name):
-                if content['enable']:
-                    new_filename, disable = _.rsplit('.', 1)
-                    os.rename(os.path.join(config_path, _), os.path.join(config_path, new_filename))
-                else:
-                    os.rename(os.path.join(config_path, _), os.path.join(config_path, _ + '.disabled'))
+                os.symlink(available_site, enabled_site)
+            else:
+                if os.path.exists(enabled_site):
+                    os.remove(enabled_site)
 
-    return flask.make_response({'success': True}), 200
+    return flask.make_response({"success": True}), 200
