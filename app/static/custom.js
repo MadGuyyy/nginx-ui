@@ -8,9 +8,12 @@ $(document).ready(function() {
 
     $('#domains').click(function() { load_domains() });
 
+    $("#add_domain").on('keyup', function (event) {if (event.keyCode === 13) {add_domain()}});
+
     load_domains();
 
 });
+
 
 function load_domains() {
     $.when(fetch_html('api/domains')).then(function() {
@@ -21,7 +24,11 @@ function load_domains() {
 
 function add_domain() {
     var name = $('#add_domain').val();
+    if (!name) {
+        return
+    }
     $('#add_domain').val('');
+    document.activeElement.blur()
 
     $.ajax({
         type: 'POST',
@@ -30,7 +37,6 @@ function add_domain() {
             201: function() { fetch_domain(name) }
         }
     });
-
 }
 
 function enable_domain(name, enable) {
