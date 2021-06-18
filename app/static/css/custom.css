@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+@import url("https://cdn.jsdelivr.net/gh/tonsky/FiraCode@5.2/distr/fira_code.css");
 
 textarea {
     margin: 0;
@@ -8,7 +8,7 @@ textarea {
 .code {
     font-size: 17px;
     font-weight: 200;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Fira Code', monospace;
 }
 
 #main-container {
