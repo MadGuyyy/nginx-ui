@@ -2,13 +2,13 @@ import datetime
 import os
 
 import flask
+from flask_login import login_required
 
 from app.api import api
-from app import auth
 
 
 @api.route("/config/<name>", methods=["GET"])
-@auth.login_required
+@login_required
 def get_config(name: str):
     """
     Reads the file with the corresponding name that was passed.
@@ -28,7 +28,7 @@ def get_config(name: str):
 
 
 @api.route("/config/<name>", methods=["POST"])
-@auth.login_required
+@login_required
 def post_config(name: str):
     """
     Accepts the customized configuration and saves it in the configuration file with the supplied name.
@@ -49,7 +49,7 @@ def post_config(name: str):
 
 
 @api.route("/domains", methods=["GET"])
-@auth.login_required
+@login_required
 def get_domains():
     """
     Reads all files from the configuration file directory and checks the state of the site configuration.
@@ -81,7 +81,7 @@ def get_domains():
 
 
 @api.route("/domain/<name>", methods=["GET"])
-@auth.login_required
+@login_required
 def get_domain(name: str):
     """
     Takes the name of the domain configuration file and
@@ -117,7 +117,7 @@ def get_domain(name: str):
 
 
 @api.route("/domain/<name>", methods=["POST"])
-@auth.login_required
+@login_required
 def post_domain(name: str):
     """
     Creates the configuration file of the domain.
@@ -145,7 +145,7 @@ def post_domain(name: str):
 
 
 @api.route("/domain/<name>", methods=["DELETE"])
-@auth.login_required
+@login_required
 def delete_domain(name: str):
     """
     Deletes the configuration file of the corresponding domain.
@@ -179,7 +179,7 @@ def delete_domain(name: str):
 
 
 @api.route("/domain/<name>", methods=["PUT"])
-@auth.login_required
+@login_required
 def put_domain(name: str):
     """
     Updates the configuration file with the corresponding domain name.
@@ -203,7 +203,7 @@ def put_domain(name: str):
 
 
 @api.route("/domain/<name>/enable", methods=["POST"])
-@auth.login_required
+@login_required
 def enable_domain(name: str):
     """
     Activates the domain in Nginx so that the configuration is applied.

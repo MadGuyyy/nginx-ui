@@ -1,11 +1,13 @@
-from app.ui import ui
-import flask
 import os
-from app import auth
+
+import flask
+from flask_login import login_required
+
+from app.ui import ui
 
 
-@ui.route('/',  methods=['GET'])
-@auth.login_required
+@ui.route("/", methods=["GET"])
+@login_required
 def index():
     """
     Delivers the home page of Nginx UI.
@@ -13,6 +15,6 @@ def index():
     :return: Rendered HTML document.
     :rtype: str
     """
-    nginx_path = flask.current_app.config['NGINX_PATH']
-    config = [f for f in os.listdir(nginx_path) if os.path.isfile(os.path.join(nginx_path, f))]
+    nginx_path = flask.current_app.config["NGINX_PATH"]
+    config = [file for file in os.listdir(nginx_path) if os.path.isfile(os.path.join(nginx_path, file))]
     return flask.render_template('index.html', config=config)

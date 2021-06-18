@@ -1,40 +1,48 @@
-$(document).ready(function() {
+$(document).ready(function () {
     $('.ui.dropdown').dropdown();
 
-    $('.config.item').click(function() {
-        var name = $(this).html();
+    $('.config.item').click(function () {
+        let name = $(this).html();
         load_config(name);
     });
 
-    $('#domains').click(function() { load_domains() });
+    $('#domains').click(function () {
+        load_domains()
+    });
 
-    $("#add_domain").on('keyup', function (event) {if (event.keyCode === 13) {add_domain()}});
+    $('#add_domain').on('keyup', function (event) {
+        if (event.keyCode === 13) {
+            add_domain()
+        }
+    });
 
     load_domains();
-
 });
 
 
 function load_domains() {
-    $.when(fetch_html('api/domains')).then(function() {
+    $.when(fetch_html('api/domains')).then(function () {
         $('#domain').hide();
         $('#domain_cards').fadeIn();
     });
 }
 
 function add_domain() {
-    var name = $('#add_domain').val();
+    let selector = $('#add_domain');
+    let name = selector.val();
     if (!name) {
         return
     }
-    $('#add_domain').val('');
     document.activeElement.blur()
+    selector.val('');
 
     $.ajax({
         type: 'POST',
         url: '/api/domain/' + name,
         statusCode: {
-            201: function() { fetch_domain(name) }
+            201: function () {
+                fetch_domain(name)
+            }
         }
     });
 }
@@ -50,14 +58,16 @@ function enable_domain(name, enable) {
             enable: enable
         }),
         statusCode: {
-            200: function() { fetch_domain(name); }
+            200: function () {
+                fetch_domain(name);
+            }
         }
     });
 
 }
 
 function update_domain(name) {
-    var _file = $('#file-content').val();
+    let _file = $('#file-content').val();
     $('#dimmer').addClass('active');
 
     $.ajax({
@@ -69,7 +79,11 @@ function update_domain(name) {
             file: _file
         }),
         statusCode: {
-            200: function() { setTimeout(function(){ fetch_domain(name) }, 400) }
+            200: function () {
+                setTimeout(function () {
+                    fetch_domain(name)
+                }, 400)
+            }
         }
     });
 
@@ -78,15 +92,15 @@ function update_domain(name) {
 function fetch_domain(name) {
 
     fetch('api/domain/' + name)
-    .then(function(response) {
-        response.text().then(function(text) {
-            $('#domain').html(text).fadeIn();
-            $('#domain_cards').hide();
+        .then(function (response) {
+            response.text().then(function (text) {
+                $('#domain').html(text).fadeIn();
+                $('#domain_cards').hide();
+            });
+        })
+        .catch(function (error) {
+            console.error(error);
         });
-    })
-    .catch(function(error) {
-        console.error(error);
-    });
 
 }
 
@@ -96,10 +110,10 @@ function remove_domain(name) {
         type: 'DELETE',
         url: '/api/domain/' + name,
         statusCode: {
-            200: function() {
+            200: function () {
                 load_domains();
             },
-            400: function() {
+            400: function () {
                 alert('Deleting not possible');
             }
         }
@@ -110,19 +124,21 @@ function remove_domain(name) {
 function fetch_html(url) {
 
     fetch(url)
-    .then(function(response) {
-        response.text().then(function(text) {
-            $('#content').html(text);
+        .then(function (response) {
+            response.text().then(function (text) {
+                $('#content').html(text);
+            });
+        })
+        .catch(function (error) {
+            console.error(error);
+            return false;
         });
-    })
-    .catch(function(error) {
-        console.error(error);
-    });
+    return true;
 
 }
 
 function update_config(name) {
-    var _file = $('#file-content').val();
+    let _file = $('#file-content').val();
     $('#dimmer').addClass('active');
 
     $.ajax({
@@ -134,9 +150,9 @@ function update_config(name) {
             file: _file
         }),
         statusCode: {
-            200: function() {
+            200: function () {
 
-                setTimeout(function() {
+                setTimeout(function () {
                     $('#dimmer').removeClass('active');
                 }, 450);
 
@@ -149,13 +165,13 @@ function update_config(name) {
 function load_config(name) {
 
     fetch('api/config/' + name)
-    .then(function(response) {
-        response.text().then(function(text) {
-            $('#content').html(text);
+        .then(function (response) {
+            response.text().then(function (text) {
+                $('#content').html(text);
+            });
+        })
+        .catch(function (error) {
+            console.error(error);
         });
-    })
-    .catch(function(error) {
-        console.error(error);
-    });
 
 }
