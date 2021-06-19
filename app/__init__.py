@@ -6,7 +6,6 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 
 from config import config
-from minify import minify_all
 
 moment = Moment()
 login_manager = LoginManager()
@@ -20,7 +19,6 @@ class User(UserMixin, db.Model):
 
 
 def create_app(config_name):
-    minify_all()
     app = Flask(__name__)
 
     app.config.from_object(config[config_name])

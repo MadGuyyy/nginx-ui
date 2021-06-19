@@ -1,3 +1,8 @@
+import * as ConfigPage from './pages/config.mjs';
+import * as DomainPage from './pages/domain.mjs';
+
+let editor = null;
+
 $(document).ready(function () {
     $('.ui.dropdown').dropdown();
 
@@ -27,6 +32,7 @@ function load_domains() {
     });
 }
 
+
 function add_domain() {
     let selector = $('#add_domain');
     let name = selector.val();
@@ -46,6 +52,7 @@ function add_domain() {
         }
     });
 }
+window.add_domain = add_domain;
 
 function enable_domain(name, enable) {
 
@@ -65,9 +72,10 @@ function enable_domain(name, enable) {
     });
 
 }
+window.enable_domain = enable_domain;
 
 function update_domain(name) {
-    let code = editor.getValue();
+    let code = editor.getValue()
     $('#dimmer').addClass('active');
 
     $.ajax({
@@ -88,13 +96,15 @@ function update_domain(name) {
     });
 
 }
+window.update_domain = update_domain;
 
 function fetch_domain(name) {
     fetch('api/domain/' + name)
         .then(function (response) {
             response.text().then(function (text) {
-                $('#domain').html(text).fadeIn();
+                $('#editing').html(text).fadeIn();
                 $('#domain_cards').hide();
+                editor = DomainPage.render()
             });
         })
         .catch(function (error) {
@@ -102,6 +112,7 @@ function fetch_domain(name) {
         });
 
 }
+window.fetch_domain = fetch_domain;
 
 function remove_domain(name) {
 
@@ -119,6 +130,7 @@ function remove_domain(name) {
     });
 
 }
+window.remove_domain = remove_domain;
 
 function fetch_html(url) {
     fetch(url)
@@ -136,7 +148,7 @@ function fetch_html(url) {
 }
 
 function update_config(name) {
-    let code = editor.getValue();
+    let code = editor.getValue()
     $('#dimmer').addClass('active');
 
     $.ajax({
@@ -159,12 +171,15 @@ function update_config(name) {
     });
 
 }
+window.update_config = update_config;
 
 function load_config(name) {
     fetch('api/config/' + name)
         .then(function (response) {
             response.text().then(function (text) {
-                $('#content').html(text);
+                $('#editing').html(text).fadeIn();
+                $('#domain_cards').hide();
+                editor = ConfigPage.render()
             });
         })
         .catch(function (error) {

@@ -1,9 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm+iml,flask,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=pycharm+iml,flask,python
 
-### Custom ###
-*.min.*
-
 ### Flask ###
 instance/*
 !instance/.gitignore
