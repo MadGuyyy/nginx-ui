@@ -3,12 +3,10 @@ import os
 
 # TODO:
 # Dark mode
-# Syntax highlighting
 # Do something with config
 # Validate site paths
 # Update README
-# Docker?
-# Minify JS/CSS before deploying, remove mini files from Git
+# Reload nginx button
 
 
 class Config(object):
