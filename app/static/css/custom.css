@@ -5,8 +5,15 @@ textarea {
     border-radius: 0;
 }
 
-.ace_content {
-    font-family: 'Fira Code', monospace;
+div.workflow-editor-wrapper,
+textarea.ace_text-input,
+div.ace_text-layer,
+div.ace_line,
+div.ace_line span,
+div.ace_cursor-layer,
+div.ace_content,
+div.ace_editor > div:nth-child(7) > div:last-child {
+    font-family: 'Fira Code', monospace !important
 }
 
 #main-container {
