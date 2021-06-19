@@ -67,7 +67,7 @@ function enable_domain(name, enable) {
 }
 
 function update_domain(name) {
-    let _file = $('#file-content').val();
+    let code = editor.getValue();
     $('#dimmer').addClass('active');
 
     $.ajax({
@@ -76,7 +76,7 @@ function update_domain(name) {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         data: JSON.stringify({
-            file: _file
+            file: code
         }),
         statusCode: {
             200: function () {
@@ -90,7 +90,6 @@ function update_domain(name) {
 }
 
 function fetch_domain(name) {
-
     fetch('api/domain/' + name)
         .then(function (response) {
             response.text().then(function (text) {
@@ -122,7 +121,6 @@ function remove_domain(name) {
 }
 
 function fetch_html(url) {
-
     fetch(url)
         .then(function (response) {
             response.text().then(function (text) {
@@ -138,7 +136,7 @@ function fetch_html(url) {
 }
 
 function update_config(name) {
-    let _file = $('#file-content').val();
+    let code = editor.getValue();
     $('#dimmer').addClass('active');
 
     $.ajax({
@@ -147,7 +145,7 @@ function update_config(name) {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         data: JSON.stringify({
-            file: _file
+            file: code
         }),
         statusCode: {
             200: function () {
@@ -163,7 +161,6 @@ function update_config(name) {
 }
 
 function load_config(name) {
-
     fetch('api/config/' + name)
         .then(function (response) {
             response.text().then(function (text) {
