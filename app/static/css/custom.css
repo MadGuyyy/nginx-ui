@@ -5,9 +5,7 @@ textarea {
     border-radius: 0;
 }
 
-.code {
-    font-size: 17px;
-    font-weight: 200;
+.ace_content {
     font-family: 'Fira Code', monospace;
 }
 
