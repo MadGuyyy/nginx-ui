@@ -1,4 +1,4 @@
-# nginx ui
+## nginx ui
 
 ```yaml
 nginx-ui:
@@ -10,21 +10,16 @@ nginx-ui:
     from: https://github.com/Kanin/nginx-ui-fork
 ```
 
-![Docker Image CI](https://github.com/schenkd/nginx-ui/workflows/Docker%20Image%20CI/badge.svg)
+![Image of Nginx UI](https://i.ibb.co/qNgBRrt/Bildschirmfoto-2020-06-21-um-10-01-46.png)
 
-![Image of Nginx UI](https://i.ibb.co/XXcfsDp/Bildschirmfoto-2020-06-20-um-18-40-27.png)
 
-Table of Contents
+## Table of Contents
 
-- [nginx ui](#nginx-ui)
-  - [Introduction](#introduction)
-  - [Setup](#setup)
-    - [Example](#example)
-    - [Docker](#docker)
-  - [UI](#ui)
-  - [Authentication](#authentication)
-    - [Configure the auth file](#configure-the-auth-file)
-    - [Configure nginx](#configure-nginx)
+> [**Introduction**](#introduction)\
+> [**Setup**](#setup)
+- [Example](#example)
+> [**UI**](#ui)\
+> [**Authentication**](#authentication)
 
 ## Introduction
 
@@ -73,7 +68,7 @@ services:
 
 ## UI
 
-![Image of Nginx UI](https://i.ibb.co/qNgBRrt/Bildschirmfoto-2020-06-21-um-10-01-46.png)
+![Image of Nginx UI](https://i.ibb.co/XXcfsDp/Bildschirmfoto-2020-06-20-um-18-40-27.png)
 
 With the menu item Main Config the Nginx specific configuration files
 can be extracted and updated. These are dynamically read from the Nginx
