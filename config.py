@@ -10,12 +10,15 @@ import os
 
 
 class Config(object):
-    SECRET_KEY = "759897607520e195bf25c407330853a3"
+    SECRET_KEY = "759897607520e195bf25c40733085300"
     SQLALCHEMY_DATABASE_URI = "sqlite:///db.sqlite"
-    AUTH_PASSWORD = "supersecret"
+    AUTH_PASSWORD = ""
     NGINX_PATH = "/etc/nginx"
     SITES_AVAILABLE_PATH = os.path.join(NGINX_PATH, "sites-available")
     SITES_ENABLED_PATH = os.path.join(NGINX_PATH, "sites-enabled")
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SESSION_TYPE = "sqlalchemy"
+    SESSION_COOKIE_SAMESITE = "Lax"
 
     @staticmethod
     def init_app(app):
